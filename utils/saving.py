@@ -1,7 +1,7 @@
 import discord
 from pathlib import Path
-from utils.files import get_save_path
-from utils.commons import is_message_invalid 
+from utils.files import download_attachments, get_save_path
+from utils.commons import get_attachments_paths_as_markdown_links, is_message_invalid 
 
 async def save_message(message: discord.Message, override_file: bool = False) -> bool:
     assert isinstance(message.channel, discord.TextChannel) and message.guild is not None
@@ -11,7 +11,12 @@ async def save_message_to_file(message: discord.Message, file_path: Path, overri
     if is_message_invalid(message):
         print(f"Message {message.id} is invalid, not saving.")
         return False
-    save_string_to_file(get_message_string(message), file_path, override_file)
+    
+    attachments_paths = await download_attachments(message.attachments, name_prefix=str(message.id))
+    message_string = get_message_string(message, attachments_paths)
+
+    save_string_to_file(message_string, file_path, override_file)
+
     return True    
 
 def save_string_to_file(string: str, file_path: Path, override_file: bool) -> None:
@@ -23,8 +28,12 @@ def create_message_string_from_messages(messages: list[discord.Message]) -> str:
     message_strings = [get_message_string(msg) for msg in messages]
     return "".join(message_strings)
 
-def get_message_string(message: discord.Message) -> str:
-    return f"{message.created_at:%Y-%m-%d %H:%M:%S} [{message.id}]({message.jump_url})\n\n{message.content}\n\n"
+def get_message_string(message: discord.Message, attachments_paths: list[Path] = []) -> str:
+    message_string = f"{message.created_at:%Y-%m-%d %H:%M:%S} [{message.id}]({message.jump_url})\n\n{message.content}\n\n"
+    if len(attachments_paths) > 0:
+        markdown_links = get_attachments_paths_as_markdown_links(attachments_paths)
+        message_string += " ".join(markdown_links) + "\n\n"
+    return message_string
 
 async def backup_channel(channel: discord.TextChannel) -> int:
     messages: list[discord.Message] = []
