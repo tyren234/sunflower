@@ -1,5 +1,9 @@
 import discord
-from utils.messages import *
+from commands.count import perform_count_messages_in_channel
+from commands.help import perform_help_message
+from commands.save import perform_save_message
+from commands.backup import perform_channel_backup
+from commands.info import perform_message_info
 from utils.commons import is_message_invalid
 
 class Client(discord.Client):
@@ -19,6 +23,8 @@ class Client(discord.Client):
             await perform_message_info(message)
         elif message.content.lower().startswith("!save"):
             await perform_save_message(message)
+        elif message.content.lower().startswith("!backup"):
+            await perform_channel_backup(message)
         elif message.content.lower().startswith('!count'):
             assert isinstance(message.channel, discord.TextChannel)
             channel: discord.TextChannel = message.channel
