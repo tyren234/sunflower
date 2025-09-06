@@ -38,6 +38,7 @@ def get_message_string(message: discord.Message, attachments_paths: list[Path] =
         markdown_links = get_attachments_paths_as_markdown_links(attachments_paths)
         message_string += " ".join(markdown_links) + "\n\n"
     message_string += "---\n\n"
+    print(f"Got message {message.id} string.")
     return message_string
 
 async def backup_channel(channel: discord.TextChannel) -> int:
