@@ -1,24 +1,16 @@
 import discord
+from client import Client
 from dotenv import load_dotenv
 import os
 
-class Client(discord.Client):
-    async def on_ready(self):
-        print(f'Logged in as {self.user}')
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-
-        if message.content.lower().startswith('!hello'):
-            await message.channel.send(f"Hello {message.author.name}!")
-            print( f"Message content: {message.content}")
+load_dotenv()
+token: str | None = os.getenv("SUNFLOWER_TOKEN")
+if token is None:
+    raise ValueError("No token found in environment variables.")
+print(f"Loaded Token: {token[:10]}...")
 
 intents = discord.Intents.default()
 intents.message_content = True
-
-load_dotenv()
-token = os.getenv("SUNFLOWER_TOKEN")
-print(f"Token: {token}")
 
 client = Client(intents=intents)
 client.run(token)
