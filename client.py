@@ -13,14 +13,13 @@ class Client(discord.Client):
             await message.channel.send("This bot can only be used in a server text channel.")
             return
 
-        if message.content.lower() == '!help':
-            await message.channel.send(get_help_message())
-
-        if message.content.lower() == '!info':
-            await message.channel.send(get_message_info(message))
-
-        assert isinstance(message.channel, discord.TextChannel)
-        channel: discord.TextChannel = message.channel
-        if message.content.lower() == '!count':
-            counter = await count_messages_in_channel(channel)
-            await message.channel.send(f"This channel has {counter} messages in it.")
+        if message.content.lower().startswith('!help'):
+            await perform_help_message(message)
+        elif message.content.lower().startswith('!info'):
+            await perform_message_info(message)
+        elif message.content.lower().startswith("!save"):
+            await perform_save_message(message)
+        elif message.content.lower().startswith('!count'):
+            assert isinstance(message.channel, discord.TextChannel)
+            channel: discord.TextChannel = message.channel
+            await perform_count_messages_in_channel(channel)
