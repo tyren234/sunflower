@@ -24,8 +24,12 @@ def save_string_to_file(string: str, file_path: Path, override_file: bool) -> No
     with file_path.open("a" if not override_file else "w", encoding="utf-8") as file:
         file.write(string)
 
-def create_message_string_from_messages(messages: list[discord.Message]) -> str:
-    message_strings = [get_message_string(msg) for msg in messages]
+async def create_message_string_from_messages(messages: list[discord.Message]) -> str:
+    message_strings: list[str] = []
+    for message in messages:
+        attachments_paths = await download_attachments(message.attachments, name_prefix=str(message.id))
+        message_strings.append(get_message_string(message, attachments_paths))
+
     return "".join(message_strings)
 
 def get_message_string(message: discord.Message, attachments_paths: list[Path] = []) -> str:
@@ -33,6 +37,7 @@ def get_message_string(message: discord.Message, attachments_paths: list[Path] =
     if len(attachments_paths) > 0:
         markdown_links = get_attachments_paths_as_markdown_links(attachments_paths)
         message_string += " ".join(markdown_links) + "\n\n"
+    message_string += "---\n\n"
     return message_string
 
 async def backup_channel(channel: discord.TextChannel) -> int:
@@ -43,5 +48,5 @@ async def backup_channel(channel: discord.TextChannel) -> int:
             continue
         messages.append(message)
 
-    save_string_to_file(create_message_string_from_messages(messages), get_save_path(channel.guild.name, channel.name), override_file=True)
+    save_string_to_file(await create_message_string_from_messages(messages), get_save_path(channel.guild.name, channel.name), override_file=True)
     return len(messages)
