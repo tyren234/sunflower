@@ -11,6 +11,7 @@ print(f"Loaded Token: {token[:10]}...")
 
 intents = discord.Intents.default()
 intents.message_content = True
+activity = discord.Activity(type=discord.ActivityType.playing, name="Archiving your messages")
 
-client = Client(intents=intents)
+client = Client(intents=intents, activity=activity)
 client.run(token)
