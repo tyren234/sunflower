@@ -1,4 +1,7 @@
+import aiohttp
 import discord
+
+from utils.files import get_asset_path
 
 async def perform_message_info(request_message: discord.Message) -> None:
     assert request_message.content is not None
@@ -24,6 +27,13 @@ async def perform_message_info(request_message: discord.Message) -> None:
     except:
         await request_message.channel.send(f"Message with ID `{message_id}` not found in channel {channel.jump_url}.")
         return
+
+    for attachment in message_to_info.attachments:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(attachment.url) as r:
+                if r.status == 200:
+                    with open(get_asset_path(attachment.filename), "wb") as handler:
+                        handler.write(await r.read())
 
     info_text = (
         f"Message ID: {message_to_info.id}\n"
