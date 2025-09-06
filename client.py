@@ -15,13 +15,13 @@ class Client(discord.Client):
             return
         channel_name: str = channel.name
 
-        if message.content.lower().startswith('!hello'):
+        if message.content.lower() == '!help':
+            await message.channel.send(get_help_message())
+
+        if message.content.lower() == '!channel':
             await message.channel.send(f"This message was sent on {message.channel.id}: {channel_name}")
             print(f"Message content: {message.content}")
 
-        if message.content.lower().startswith('!channels'):
-            await message.channel.send(f"All channels I can see are: {list(self.get_all_channels())}.")
-        
-        if message.content.lower().startswith('!firstmsg'):
-            counter = await count_messages(channel)
+        if message.content.lower() == '!count':
+            counter = await count_messages_in_channel(channel)
             await message.channel.send(f"This channel has {counter} messages in it.")
