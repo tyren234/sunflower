@@ -1,7 +1,7 @@
 import discord
 from pathlib import Path
 from utils.files import download_attachments, get_save_path
-from utils.commons import get_attachments_paths_as_markdown_links, is_message_invalid 
+from utils.commons import get_attachments_paths_as_markdown_links, is_message_invalid, add_header_and_footer_to_message_string
 
 async def save_message(message: discord.Message, override_file: bool = False) -> bool:
     assert isinstance(message.channel, discord.TextChannel) and message.guild is not None
@@ -33,11 +33,12 @@ async def create_message_string_from_messages(messages: list[discord.Message]) -
     return "".join(message_strings)
 
 def get_message_string(message: discord.Message, attachments_paths: list[Path] = []) -> str:
-    message_string = f"{message.created_at:%Y-%m-%d %H:%M:%S} [{message.id}]({message.jump_url})\n\n{message.content}\n\n"
+    message_string = message.content
     if len(attachments_paths) > 0:
         markdown_links = get_attachments_paths_as_markdown_links(attachments_paths)
         message_string += " ".join(markdown_links) + "\n\n"
-    message_string += "---\n\n"
+    
+    message_string = add_header_and_footer_to_message_string(message, message_string)
     print(f"Got message {message.id} string.")
     return message_string
 
