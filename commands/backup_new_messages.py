@@ -26,5 +26,9 @@ async def perform_backup_new_messages(request_message: discord.Message) -> None:
         await request_message.channel.send(f"Channel {channel_to_backup.jump_url} is not a text channel.")
         return
     
-    await backup_new_messages(channel_to_backup)
+    no_backed_up_messages: int = await backup_new_messages(channel_to_backup)
+    if no_backed_up_messages > 0:
+        await request_message.channel.send(f"Successfully backed up {no_backed_up_messages} messages from {channel_to_backup.jump_url}.")
+    else:
+        await request_message.channel.send(f"Failed to save messages from {channel_to_backup.jump_url}.")
     return
