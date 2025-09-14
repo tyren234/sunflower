@@ -9,5 +9,6 @@ async def perform_help_message(message: discord.Message) -> None:
         "`!save <message id>` - Save a specific message from this channel to a file\n"
         "`!save <message id> <channel id>` - Save a specific message from a specified channel to a file\n"
         "`!backup <channel id>` - Backup all messages in a specified channel to a file\n"
+        "`!last` - Show the last saved message ID from the current channel's backup file\n"
     )
     await message.channel.send(help_text)

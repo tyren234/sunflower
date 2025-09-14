@@ -1,10 +1,13 @@
 import discord
 from commands.count import perform_count_messages_in_channel
 from commands.help import perform_help_message
+from commands.last import perform_last
 from commands.save import perform_save_message
 from commands.backup import perform_channel_backup
 from commands.info import perform_message_info
 from utils.commons import is_message_invalid
+
+from utils.files import *
 
 class Client(discord.Client):
     async def on_ready(self):
@@ -25,6 +28,8 @@ class Client(discord.Client):
             await perform_save_message(message)
         elif message.content.lower().startswith("!backup"):
             await perform_channel_backup(message)
+        elif message.content.lower().startswith("!last"):
+            await perform_last(message)
         elif message.content.lower().startswith('!count'):
             assert isinstance(message.channel, discord.TextChannel)
             channel: discord.TextChannel = message.channel

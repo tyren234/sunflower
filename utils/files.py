@@ -4,6 +4,7 @@ import aiohttp
 import aiofiles
 from dotenv import load_dotenv
 import os
+import re
 
 load_dotenv()
 SUNFLOWER_SAVE_DIRECTORY: str | None = os.getenv("SUNFLOWER_SAVE_DIRECTORY")
@@ -29,10 +30,17 @@ def get_asset_path(filename: str, name_prefix: str = "", relative_to_notes: bool
         filename = f"{name_prefix}_{filename}"
     return (relative_assets_directory if relative_to_notes else assets_directory) / filename
 
-'''
-Download attachments to the assets directory and return list of saved paths.
-'''
 async def download_attachments(attachments: list[discord.Attachment], name_prefix: str = "") -> list[Path]:
+    '''
+    Download attachments to the assets directory and return list of saved paths.
+
+    Args:
+        attachments (list[discord.Attachment]): List of attachments to download.
+        name_prefix (str, optional): Prefix added to the filename. 
+
+    Returns:
+        list[Path]: List of local paths where attachments were saved.
+    '''
     assets_directory.mkdir(exist_ok=True, parents=True)
     saved_paths: list[Path] = []
 
@@ -47,4 +55,24 @@ async def download_attachments(attachments: list[discord.Attachment], name_prefi
                         saved_paths.append(get_asset_path(attachment.filename, name_prefix, relative_to_notes=True))
     
     return saved_paths
+
+def get_last_message_id_from_file(file_path: Path) -> tuple[str, int] | None:
+    """
+    Get the last saved message ID from the file.
+
+    Args:
+        file_path (Path): Path to the file.
+        
+    Returns:
+        tuple[str, int] | None: Tuple of the last saved message header string and message ID, or `None` if file doesn't exist or no messages found."""
+    if not file_path.exists():
+        return None
+    
+    with file_path.open("r", encoding="utf-8") as file:
+        content = file.read()
+        # Match the exact header format: YYYY-MM-DD HH:MM:SS [message_id](https://...)
+        matches = re.findall(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} (\[(\d+)\]\(https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+\))', content)
+        if matches:
+            return (matches[-1][0], int(matches[-1][1]))
+    return None
 
