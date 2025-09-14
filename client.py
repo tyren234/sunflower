@@ -7,9 +7,9 @@ from commands.backup import perform_channel_backup
 from commands.info import perform_message_info
 from commands.backup_new_messages import perform_backup_new_messages
 
-from utils.commons import is_message_invalid
+from utils.commons import is_message_invalid, sunflower_send
 import load_env
-# from load_env import sunflower_output_channel_id, sunflower_output_channel
+from utils.saving import backup_new_messages
 
 class Client(discord.Client):
     async def on_ready(self):
@@ -45,3 +45,15 @@ class Client(discord.Client):
             assert isinstance(message.channel, discord.TextChannel)
             channel: discord.TextChannel = message.channel
             await perform_count_messages_in_channel(channel)
+        # Just backup the message
+        else:
+            if not isinstance(message.channel, discord.TextChannel):
+                print(f"Can't backup non-text channels.")
+                await sunflower_send(f"Can't backup non-text channels.", message)
+                return
+            no_backed_up_messages: int = await backup_new_messages(message.channel)
+            if no_backed_up_messages > 0:
+                await sunflower_send(f"Successfully backed up {no_backed_up_messages} messages from {message.channel.jump_url}.", message)
+            else:
+                await sunflower_send(f"Failed to save messages from {message.channel.jump_url}.", message)
+
