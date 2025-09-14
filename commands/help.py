@@ -1,5 +1,4 @@
 import discord
-from utils.commons import sunflower_send
 async def perform_help_message(request_message: discord.Message) -> None:
     help_text = (
         "\nAvailable commands:\n"
@@ -11,4 +10,4 @@ async def perform_help_message(request_message: discord.Message) -> None:
         "`!backupnew <channel id>` - Backup new messages in a specified channel since the last saved message\n"
         "`!last` - Show the last saved message ID from the current channel's backup file\n"
     )
-    await sunflower_send(help_text, request_message)
+    await request_message.channel.send(help_text)
