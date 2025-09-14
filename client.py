@@ -8,10 +8,19 @@ from commands.info import perform_message_info
 from commands.backup_new_messages import perform_backup_new_messages
 
 from utils.commons import is_message_invalid
+import load_env
+# from load_env import sunflower_output_channel_id, sunflower_output_channel
 
 class Client(discord.Client):
     async def on_ready(self):
-        print(f'Logged in as {self.user}')
+        print(f"Logged in as {self.user}")
+        load_env.load_output_channel_id()
+        # `sunflower_output_channel` and `sunflower_output_channel_id` are global! Watch out!
+        if load_env.sunflower_output_channel_id is not None:
+            channel = await self.fetch_channel(int(load_env.sunflower_output_channel_id))
+            if isinstance(channel, discord.abc.Messageable):
+                load_env.sunflower_output_channel = channel
+        print("Will send updates to a channel" if load_env.sunflower_output_channel is not None else "Won't send updates to a channel. Channel not found.")
 
     async def on_message(self, message: discord.Message):
         if message.author == self.user:
@@ -20,7 +29,7 @@ class Client(discord.Client):
             await message.channel.send("This bot can only be used in a server text channel.")
             return
 
-        if message.content.lower().startswith('!help'):
+        if message.content.lower().startswith("!help"):
             await perform_help_message(message)
         elif message.content.lower().split(" ")[0] == "!info":
             await perform_message_info(message)
@@ -32,7 +41,7 @@ class Client(discord.Client):
             await perform_backup_new_messages(message)
         elif message.content.lower().startswith("!last"):
             await perform_last(message)
-        elif message.content.lower().startswith('!count'):
+        elif message.content.lower().startswith("!count"):
             assert isinstance(message.channel, discord.TextChannel)
             channel: discord.TextChannel = message.channel
             await perform_count_messages_in_channel(channel)
