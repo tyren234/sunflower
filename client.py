@@ -5,9 +5,9 @@ from commands.last import perform_last
 from commands.save import perform_save_message
 from commands.backup import perform_channel_backup
 from commands.info import perform_message_info
-from utils.commons import is_message_invalid
+from commands.backup_new_messages import perform_backup_new_messages
 
-from utils.files import *
+from utils.commons import is_message_invalid
 
 class Client(discord.Client):
     async def on_ready(self):
@@ -22,12 +22,14 @@ class Client(discord.Client):
 
         if message.content.lower().startswith('!help'):
             await perform_help_message(message)
-        elif message.content.lower().startswith('!info'):
+        elif message.content.lower().split(" ")[0] == "!info":
             await perform_message_info(message)
-        elif message.content.lower().startswith("!save"):
+        elif message.content.lower().split(" ")[0] == "!save":
             await perform_save_message(message)
-        elif message.content.lower().startswith("!backup"):
+        elif message.content.lower().split(" ")[0] == "!backup":
             await perform_channel_backup(message)
+        elif message.content.lower().split(" ")[0] == "!backupnew":
+            await perform_backup_new_messages(message)
         elif message.content.lower().startswith("!last"):
             await perform_last(message)
         elif message.content.lower().startswith('!count'):

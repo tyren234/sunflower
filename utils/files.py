@@ -56,7 +56,7 @@ async def download_attachments(attachments: list[discord.Attachment], name_prefi
     
     return saved_paths
 
-def get_last_message_id_from_file(file_path: Path) -> tuple[str, int] | None:
+def get_last_message_url_and_id_from_file(file_path: Path) -> tuple[str, int] | None:
     """
     Get the last saved message ID from the file.
 
@@ -64,7 +64,7 @@ def get_last_message_id_from_file(file_path: Path) -> tuple[str, int] | None:
         file_path (Path): Path to the file.
         
     Returns:
-        tuple[str, int] | None: Tuple of the last saved message header string and message ID, or `None` if file doesn't exist or no messages found."""
+        tuple[str, int] | None: Tuple of the last saved message url and message ID, or `None` if file doesn't exist or no messages found."""
     if not file_path.exists():
         return None
     
